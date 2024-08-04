@@ -1,0 +1,88 @@
+#include <Stepper.h>
+#include <LiquidCrystal_I2C.h>
+
+#define STEPS 32
+
+#define IN1  11
+#define IN2  10
+#define IN3   9
+#define IN4   8
+
+Stepper stepper(STEPS, IN4, IN2, IN3, IN1);
+
+#define BUTTON1  A1 // Botón para ir al primer piso
+#define BUTTON2  A2 // Botón para ir al segundo piso
+
+LiquidCrystal_I2C lcd(0x27,16,2); 
+
+int currentFloor = 0; // Variable para almacenar el piso actual del ascensor
+
+void setup()
+{
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Piso Actual: ");
+  lcd.setCursor(0,1);
+  lcd.print(currentFloor); 
+
+  pinMode(BUTTON1, INPUT_PULLUP); // Configurar el pin del botón 1 como entrada con pull-up
+  pinMode(BUTTON2, INPUT_PULLUP); // Configurar el pin del botón 2 como entrada con pull-up
+}
+
+void loop()
+{
+  // Verificar si se presiona el botón para ir al primer piso
+  if (digitalRead(BUTTON1) == LOW && currentFloor != 1)
+  {
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Subiendo al 1er piso");
+    moveElevator(1);
+  }
+  
+  // Verificar si se presiona el botón para ir al segundo piso
+  if (digitalRead(BUTTON2) == LOW && currentFloor != 2)
+  {
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Subiendo al 2do piso");
+    moveElevator(2);
+  }
+}
+
+void moveElevator(int targetFloor)
+{
+  int stepsPerFloor = STEPS / 2; // Cada piso requiere la mitad de los pasos
+  int stepsToMove = abs(currentFloor - targetFloor) * stepsPerFloor; // Calcular la cantidad de pasos para moverse entre pisos
+
+  if (targetFloor > currentFloor)
+  {
+    // Subir al siguiente piso
+    stepper.setSpeed(100); // Establecer la velocidad del motor
+    for (int i = 0; i < stepsToMove; i++)
+    {
+      stepper.step(1);
+      delay(5);
+    }
+    currentFloor = targetFloor;
+  }
+  else if (targetFloor < currentFloor)
+  {
+    // Bajar al siguiente piso
+    stepper.setSpeed(100); // Establecer la velocidad del motor
+    for (int i = 0; i < stepsToMove; i++)
+    {
+      stepper.step(-1);
+      delay(5);
+    }
+    currentFloor = targetFloor;
+  }
+
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Piso Actual: ");
+  lcd.setCursor(0,1);
+  lcd.print(currentFloor); 
+}

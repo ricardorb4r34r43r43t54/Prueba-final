@@ -1,0 +1,75 @@
+#include <LiquidCrystal_I2C.h>
+#include <Stepper.h>
+
+const int Boton1 = 2;
+const int Boton2 = 3;
+const int LED1 = 11;
+const int LED2 = 12;
+
+void setup(){  
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2,OUTPUT);
+  pinMode(Boton1, INPUT);
+  pinMode(Boton2,INPUT);  
+}
+
+void loop(){
+  bool e = digitalRead(Boton1);
+  if (e ==1){     digitalWrite(LED1,HIGH);   
+  }
+  else{     digitalWrite(LED1,LOW);
+}  
+
+bool i = digitalRead(Boton2);
+  if (i ==1){     digitalWrite(LED2,HIGH);
+  }   
+  else{     digitalWrite(LED2,LOW);   
+  }
+}
+"""
+#include <LiquidCrystal_I2C.h>
+
+const int Boton1 = 2;
+const int Boton2 = 3;
+const int LED1 = 11;
+const int LED2 = 12;
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // Dirección I2C 0x27, 16 columnas y 2 filas
+
+void setup() {
+  lcd.init();          // Inicializa el LCD
+  lcd.backlight();     // Enciende la retroiluminación del LCD
+
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(Boton1, INPUT);
+  pinMode(Boton2, INPUT);
+}
+
+void loop() {
+  bool e = digitalRead(Boton1);
+  bool i = digitalRead(Boton2);
+
+  if (e == 1) {
+    digitalWrite(LED1, HIGH);
+    lcd.setCursor(0, 0);
+    lcd.print("Boton 1: Piso 1  ");  // Mensaje para Botón 1
+  } else {
+    digitalWrite(LED1, LOW);
+    lcd.setCursor(0, 0);
+    lcd.print("                   ");  // Borra el mensaje cuando no se presiona el Botón 1
+  }
+
+  if (i == 1) {
+    digitalWrite(LED2, HIGH);
+    lcd.setCursor(0, 1);
+    lcd.print("Boton 2: Piso 2  ");  // Mensaje para Botón 2
+  } else {
+    digitalWrite(LED2, LOW);
+    lcd.setCursor(0, 1);
+    lcd.print("                   ");  // Borra el mensaje cuando no se presiona el Botón 2
+  }
+
+  delay(100);  // Espera breve para estabilidad
+}
+

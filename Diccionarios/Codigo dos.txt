@@ -1,0 +1,96 @@
+#include <Stepper.h>
+#include <LiquidCrystal_I2C.h>
+
+// Definición de pines para el motor paso a paso
+#define IN1  11
+#define IN2  10
+#define IN3   9
+#define IN4   8
+
+// Número de pasos por revolución del motor
+#define STEPS 32
+
+// Definición de pines para los botones
+#define BUTTON_UP A1
+#define BUTTON_DOWN A2
+
+// Definición de pines para las luces LED
+#define LED_UP 5
+#define LED_DOWN 6
+
+// Definición de los pisos
+#define NUM_FLOORS 2
+#define FLOOR_HEIGHT 100 // Cantidad de pasos para moverse entre pisos
+
+// Variables para controlar el motor paso a paso
+Stepper stepper(STEPS, IN4, IN2, IN3, IN1);
+
+// Variable para controlar la pantalla LCD
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// Variables para controlar el estado del elevador
+int currentFloor = 0; // Piso actual del elevador
+
+void setup() {
+  // Configuración de los pines
+  pinMode(BUTTON_UP, INPUT_PULLUP);
+  pinMode(BUTTON_DOWN, INPUT_PULLUP);
+  pinMode(LED_UP, OUTPUT);
+  pinMode(LED_DOWN, OUTPUT);
+
+  // Inicialización de la pantalla LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Elevador");
+}
+
+void loop() {
+  // Verificar si se presiona el botón para subir
+  if (digitalRead(BUTTON_UP) == LOW && currentFloor < NUM_FLOORS - 1) {
+    moveElevator(currentFloor + 1);
+  }
+
+  // Verificar si se presiona el botón para bajar
+  if (digitalRead(BUTTON_DOWN) == LOW && currentFloor > 0) {
+    moveElevator(currentFloor - 1);
+  }
+}
+
+void moveElevator(int targetFloor) {
+  // Determinar la dirección del movimiento
+  int direction = (targetFloor > currentFloor) ? 1 : -1;
+
+  // Encender la luz LED correspondiente
+  if (direction == 1) {
+    digitalWrite(LED_UP, HIGH);
+    digitalWrite(LED_DOWN, LOW);
+  } else {
+    digitalWrite(LED_UP, LOW);
+    digitalWrite(LED_DOWN, HIGH);
+  }
+
+  // Calcular la cantidad de pasos para moverse al piso objetivo
+  int stepsToMove = abs(targetFloor - currentFloor) * FLOOR_HEIGHT;
+
+  // Mover el motor paso a paso
+  for (int i = 0; i < stepsToMove; i++) {
+    stepper.setSpeed(200); // Velocidad del motor (ajustar según sea necesario)
+    stepper.step(direction);
+    delay(10); // Retardo para controlar la velocidad del movimiento
+  }
+
+  // Actualizar el piso actual
+  currentFloor = targetFloor;
+
+  // Apagar ambas luces LED
+  digitalWrite(LED_UP, LOW);
+  digitalWrite(LED_DOWN, LOW);
+
+  // Actualizar la pantalla LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Piso Actual: ");
+  lcd.print(currentFloor + 1); // Sumamos 1 para mostrar el piso en base 1
+}
