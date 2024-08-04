@@ -1,0 +1,44 @@
+// Definición de pines para las luces del semáforo
+const int pinRojo = 13;
+const int pinAmarillo = 12;
+const int pinVerde = 11;
+const int pinBuzzer = 7; // Pin para el buzzer
+
+// Tiempos de espera para cada estado del semáforo (en milisegundos)
+const unsigned long tiempoVerde = 5000;     // 5 segundos
+const unsigned long tiempoRojo = 6000;      // 6 segundos
+const unsigned long tiempoAmarillo = 3000;  // 3 segundos
+
+void setup() {
+  // Configurar los pines de salida
+  pinMode(pinRojo, OUTPUT);
+  pinMode(pinAmarillo, OUTPUT);
+  pinMode(pinVerde, OUTPUT);
+  pinMode(pinBuzzer, OUTPUT); // Configurar el pin del buzzer como salida
+}
+
+void loop() {
+  // Encender luz verde y hacer sonar el buzzer, apagar las demás
+  digitalWrite(pinVerde, HIGH);
+  tone(pinBuzzer, 1000); // Hacer sonar el buzzer a 1000 Hz
+  digitalWrite(pinAmarillo, LOW);
+  digitalWrite(pinRojo, LOW);
+  delay(tiempoVerde);
+  noTone(pinBuzzer); // Detener el sonido del buzzer
+
+  // Encender luz amarilla y hacer sonar el buzzer, apagar las demás
+  digitalWrite(pinVerde, LOW);
+  digitalWrite(pinAmarillo, HIGH);
+  tone(pinBuzzer, 1500); // Hacer sonar el buzzer a 1500 Hz
+  digitalWrite(pinRojo, LOW);
+  delay(tiempoAmarillo);
+  noTone(pinBuzzer); // Detener el sonido del buzzer
+
+  // Encender luz roja y hacer sonar el buzzer, apagar las demás
+  digitalWrite(pinVerde, LOW);
+  digitalWrite(pinAmarillo, LOW);
+  digitalWrite(pinRojo, HIGH);
+  tone(pinBuzzer, 2000); // Hacer sonar el buzzer a 2000 Hz
+  delay(tiempoRojo);
+  noTone(pinBuzzer); // Detener el sonido del buzzer
+}
