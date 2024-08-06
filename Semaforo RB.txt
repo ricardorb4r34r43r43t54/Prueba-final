@@ -41,4 +41,5 @@ void loop() {
   tone(pinBuzzer, 2000); // Hacer sonar el buzzer a 2000 Hz
   delay(tiempoRojo);
   noTone(pinBuzzer); // Detener el sonido del buzzer
+  delay(2000);
 }
